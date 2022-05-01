@@ -80,6 +80,7 @@
     OPEN(OPEN_COUNT,:)=insert_open(xNode,yNode,xNode,yNode,goal_distance,path_cost,goal_distance);
     OPEN(OPEN_COUNT,1)=0;
     CLOSED_COUNT=CLOSED_COUNT+1;
+    tag = CLOSED_COUNT;
     CLOSED(CLOSED_COUNT,1)=xNode;
     CLOSED(CLOSED_COUNT,2)=yNode;
     NoPath=1;
@@ -87,6 +88,7 @@
     new_nodes = []; % this array will be used for expanding the node for   
                     % searching. 
     gn = OPEN(OPEN_COUNT,7);
+    loop_time = 0;
     
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -99,7 +101,7 @@
         node_x = xval;
         node_y = yval;
         
-        if (i_min==-1)
+        if (i_min==-1 && repeated ==0)
             error('no path found')
             break
         end
@@ -110,20 +112,34 @@
         %|X val |Y val | h(n) |g(n)|f(n)|
         %--------------------------------
         
+
+        
+        size_new_nodes = size(new_nodes,1);
+        
+        % Checking repeated items
+        for i2=1:(CLOSED_COUNT-1) 
+            if (CLOSED(i2,1) ==xval && CLOSED(i2,2) == yval)
+                repeated = 1; % its in the CLOSED
+                break
+            else
+                repeated = 0;   % its not of CLOSED
+            end
+        end     % end the for loop: Checking repeated items
+        
         OPEN(i_min,1) = 0;     % remove the node from OPEN
         CLOSED(CLOSED_COUNT,1)=xval;% add the expanded node to CLOSED     
         CLOSED(CLOSED_COUNT,2)=yval;
         CLOSED_COUNT = CLOSED_COUNT+1;
-        
-        size_new_nodes = size(new_nodes,1);
-        for ii=1:size_new_nodes     % add expanded nodes to OPEN list
-            row_num = OPEN_COUNT+ii;
-            OPEN(row_num,1) = 1;  % mark new nodes as an open node
-            OPEN(row_num,2:3) = new_nodes(ii,1:2);  % add coorinates to OPEN
-            OPEN(row_num,4:5) = [xval, yval];       % add parent coordinates to OPEN
-            OPEN(row_num,6:8) = new_nodes(ii,3:5);  % add costs to OPEN
-        end     % end of the for loop: 'add expanded nodes to OPEN list'
-        
+
+        if (repeated == 0 || loop_time == 0 )
+            for ii=1:size_new_nodes     % add expanded nodes to OPEN list
+                row_num = OPEN_COUNT+ii;
+                OPEN(row_num,1) = 1;  % mark new nodes as an open node
+                OPEN(row_num,2:3) = new_nodes(ii,1:2);  % add coorinates to OPEN
+                OPEN(row_num,4:5) = [xval, yval];       % add parent coordinates to OPEN
+                OPEN(row_num,6:8) = new_nodes(ii,3:5);  % add costs to OPEN
+            end     % end of the for loop: 'add expanded nodes to OPEN list'
+        end
         %   Find the next node to be expanded from OPEN
         OPEN_COUNT = size(OPEN,1);
         i_ref = CLOSED_COUNT -1;    % preseve final node index
@@ -133,7 +149,7 @@
             yval = OPEN(i_min,3);
             gn = OPEN(i_min, 7);
         else
-            i_final 
+            i_final = i_ref;
         end     % end of the: 'explore the node with minum f(n)'
         
         % visualise the process
@@ -142,6 +158,7 @@
         scatter(CLOSED(:,1),CLOSED(:,2),'filled','d')
         scatter(xval,yval,'b','filled')
         hold off
+        loop_time = loop_time + 1;
         
      
     end %End of While Loop
