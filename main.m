@@ -13,10 +13,10 @@ MAX_Y = 25;
 map = obstacle_map(xStart, yStart, xTarget, yTarget, MAX_X, MAX_Y);
 
 % Waypoint Generator Using the A* 
-OPEN = A_star_search(map, MAX_X,MAX_Y);
+path = A_star_search(map, MAX_X,MAX_Y);
 
 % visualize the 2D grid map
-visualize_map(map, path, []);
+% visualize_map(map, path, []);
 
 % save map
 % save('Data/map.mat', 'map', 'MAX_X', 'MAX_Y');

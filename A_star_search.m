@@ -1,4 +1,4 @@
-function path = A_star_search(map, MAX_X, MAX_Y) % Return path
+ function OPEN = A_star_search(map, MAX_X, MAX_Y) % Return path
 
 %%
     %This part is about map/obstacle/and other settings
@@ -73,89 +73,87 @@ function path = A_star_search(map, MAX_X, MAX_Y) % Return path
     
     % find the distance 
     goal_distance = usr_distance(xNode,yNode,xTarget,yTarget,distance_type);
-%     goal_distance = distance(xNode,yNode,xTarget,yTarget);
 
     path_cost=0;    % 'path_cost' is 'h(n)'
     
-    % add 
+    % add the first node to OPEN list
     OPEN(OPEN_COUNT,:)=insert_open(xNode,yNode,xNode,yNode,goal_distance,path_cost,goal_distance);
     OPEN(OPEN_COUNT,1)=0;
     CLOSED_COUNT=CLOSED_COUNT+1;
     CLOSED(CLOSED_COUNT,1)=xNode;
     CLOSED(CLOSED_COUNT,2)=yNode;
     NoPath=1;
-    Temp_path = [];
-    Temp_path(NoPath,1) = xNode;   % record temperary path
-    Temp_path(NoPath,2) = yNode;
+    i_min = 1;  % initialise the minumum value of the row number
+    new_nodes = []; % this array will be used for expanding the node for   
+                    % searching. 
+    gn = OPEN(OPEN_COUNT,7);
     
-%     %   build a temperary list for motions in different directions
-%     motion_list = [];
-
 %%
-%This part is your homework
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % START ALGORITHM
+%   'xval' & 'yval' stores the coordinate of parent node
+%   'gn' is the accumulative cost of parent node
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    while(0) %you have to dicide the Conditions for while loop exit 
+
+    while((xval~=xTarget)||(yval~=yTarget)) %you have to dicide the Conditions for while loop exit  
+        node_x = xval;
+        node_y = yval;
         
-        % evaluate the first point, (go right)
-        x_moved_1 = xval + 1;
-        y_moved_1 = yval;
-        if ((x_moved_1>MAX_X)||(x_moved_1<1)||(y_moved_1>MAX_Y)||(y_moved_1<1)...
-                ||(not(ismember(x_moved_1,CLOSED(:,1))))||...
-                (not(ismember(y_moved_1,CLOSED(:,2)))))
-            x_moved_1 = x_moved_1 - 1;
-        else
-            hn_1 = usr_distance(x_moved_1,y_moved_1,xTarget,yTarget,0);
-            gn_1 = usr_distance(x_moved_1,y_moved_1,xTarget,yTarget,distance_type);
-            fn_1 = hn_1 + gn_1;
-            par_x_1 = xval;
-            par_y_1 = yval;
+        if (i_min==-1)
+            error('no path found')
+            break
         end
         
-        % evaluate the second point, (go up right)
-        x_moved_2 = xval + 1;
-        y_moved_2 = yval + 1;
-        if ((x_moved_2>MAX_X)||(x_moved_2<1)||(y_moved_2>MAX_Y)||(y_moved_2<1)...
-                ||(not(ismember(x_moved_2,CLOSED(:,1))))||...
-                (not(ismember(y_moved_2,CLOSED(:,2)))))
-            x_moved_2 = x_moved_2 - 1;
-            y_moved_2 = y_moved_2 - 1;
-        else
-            hn_2 = usr_distance(x_moved_2,y_moved_2,xTarget,yTarget,0);
-            gn_2 = usr_distance(x_moved_2,y_moved_2,xTarget,yTarget,distance_type);
-            fn_2 = hn_2 + gn_2;
-            par_x_2 = xval;
-            par_y_2 = yval;
-        end
+        new_nodes = expand_array(node_x,node_y,gn,xTarget,yTarget,CLOSED,MAX_X,MAX_Y);
+        %'new_nodes' FORMAT
+        %--------------------------------
+        %|X val |Y val | h(n) |g(n)|f(n)|
+        %--------------------------------
         
-        % evaluate the second point, (go up)
-        x_moved_3 = xval;
-        y_moved_3 = yval + 1;
-        if ((x_moved_3>MAX_X)||(x_moved_3<1)||(y_moved_3>MAX_Y)||(y_moved_3<1)...
-                ||(not(ismember(x_moved_3,CLOSED(:,1))))||...
-                (not(ismember(y_moved_3,CLOSED(:,2)))))
-            x_moved_3 = x_moved_3;
-            y_moved_3 = y_moved_3 - 1;
+        OPEN(i_min,1) = 0;     % remove the node from OPEN
+        CLOSED(CLOSED_COUNT,1)=xval;% add the expanded node to CLOSED     
+        CLOSED(CLOSED_COUNT,2)=yval;
+        CLOSED_COUNT = CLOSED_COUNT+1;
+        
+        size_new_nodes = size(new_nodes,1);
+        for ii=1:size_new_nodes     % add expanded nodes to OPEN list
+            row_num = OPEN_COUNT+ii;
+            OPEN(row_num,1) = 1;  % mark new nodes as an open node
+            OPEN(row_num,2:3) = new_nodes(ii,1:2);  % add coorinates to OPEN
+            OPEN(row_num,4:5) = [xval, yval];       % add parent coordinates to OPEN
+            OPEN(row_num,6:8) = new_nodes(ii,3:5);  % add costs to OPEN
+        end     % end of the for loop: 'add expanded nodes to OPEN list'
+        
+        %   Find the next node to be expanded from OPEN
+        OPEN_COUNT = size(OPEN,1);
+        i_ref = CLOSED_COUNT -1;    % preseve final node index
+        i_min = min_fn(OPEN,OPEN_COUNT,xTarget,yTarget);    % i_min indicates the row number.
+        if (i_min~=-1)  % explore the node with minum f(n)
+            xval = OPEN(i_min,2);
+            yval = OPEN(i_min,3);
+            gn = OPEN(i_min, 7);
         else
-            hn_3 = usr_distance(x_moved_3,y_moved_3,xTarget,yTarget,0);
-            gn_3 = usr_distance(x_moved_3,y_moved_3,xTarget,yTarget,distance_type);
-            fn_3 = hn_3 + gn_3;
-            par_x_3 = xval;
-            par_y_3 = yval;
-        end
+            i_final 
+        end     % end of the: 'explore the node with minum f(n)'
+        
+        % visualise the process
+        scatter(OPEN(:,2),OPEN(:,3),'g')
+        hold on
+        scatter(CLOSED(:,1),CLOSED(:,2),'filled','d')
+        scatter(xval,yval,'b','filled')
+        hold off
         
      
     end %End of While Loop
     
-    %Once algorithm has run The optimal path is generated by starting of at the
-    %last node(if it is the target node) and then identifying its parent node
-    %until it reaches the start node. This is the optimal path
+    % Once algorithm has run, The optimal path is generated by starting of at the
+    % last node(if it is the target node) and then identifying its parent node
+    % until it reaches the start node. This is the optimal path
     
-    %
-    %How to get the optimal path after A_star search?
-    %please finish it
-    %
-    
-   path = [];
+    % get the optimal path after searching
+    path = [];
+    path(1,:) = [xTarget,yTarget];
+    path(2,:) = CLOSED(i_ref,:);
+    x_ref = CLOSED(i_ref,1);
+    y_ref = CLOSED(i_ref,2);
 end

@@ -8,7 +8,7 @@ function exp_array=expand_array(node_x,node_y,gn,xTarget,yTarget,CLOSED,MAX_X,MA
     
     %EXPANDED ARRAY FORMAT
     %--------------------------------
-    %|X val |Y val ||h(n) |g(n)|f(n)|
+    %|X val |Y val | h(n) |g(n)|f(n)|
     %--------------------------------
     
     exp_array=[];
@@ -30,7 +30,7 @@ function exp_array=expand_array(node_x,node_y,gn,xTarget,yTarget,CLOSED,MAX_X,MA
                         exp_array(exp_count,1) = s_x;
                         exp_array(exp_count,2) = s_y;
                         exp_array(exp_count,3) = distance(xTarget,yTarget,s_x,s_y);%distance between node and goal,hn
-                        exp_array(exp_count,4) = gn+distance(node_x,node_y,s_x,s_y);%cost of travelling to node£¬gn
+                        exp_array(exp_count,4) = gn+usr_distance(node_x,node_y,s_x,s_y,1);%cost of travelling to node£¬gn
                         exp_array(exp_count,5) = exp_array(exp_count,3)+exp_array(exp_count,4);%fn
                         exp_count=exp_count+1;
                     end%Populate the exp_array list!!!
@@ -38,3 +38,4 @@ function exp_array=expand_array(node_x,node_y,gn,xTarget,yTarget,CLOSED,MAX_X,MA
             end%End of if node is not its own successor loop
         end%End of j for loop
     end%End of k for loop    
+end
