@@ -9,7 +9,7 @@ function i_min = min_fn(OPEN,OPEN_COUNT,xTarget,yTarget)
  k=1;
  flag=0;
  goal_index=0;
- for j=OPEN_COUNT:-1:1 %% originally j=1:OPEN_COUNT
+ for j= 1:OPEN_COUNT %OPEN_COUNT:-1:1 %% originally j=1:OPEN_COUNT
      if (OPEN(j,1)==1)
          temp_array(k,:)=[OPEN(j,:) j]; %#ok<*AGROW>
          if (OPEN(j,2)==xTarget && OPEN(j,3)==yTarget)
