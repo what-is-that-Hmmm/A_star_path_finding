@@ -72,7 +72,7 @@
     OPEN_COUNT=1;
     
     % find the distance 
-    goal_distance = usr_distance(xNode,yNode,xTarget,yTarget,distance_type);
+    goal_distance = distance(xNode,yNode,xTarget,yTarget);
 
     path_cost=0;    % 'path_cost' is 'h(n)'
     
@@ -80,7 +80,6 @@
     OPEN(OPEN_COUNT,:)=insert_open(xNode,yNode,xNode,yNode,goal_distance,path_cost,goal_distance);
     OPEN(OPEN_COUNT,1)=0;
     CLOSED_COUNT=CLOSED_COUNT+1;
-    tag = CLOSED_COUNT;
     CLOSED(CLOSED_COUNT,1)=xNode;
     CLOSED(CLOSED_COUNT,2)=yNode;
     NoPath=1;
