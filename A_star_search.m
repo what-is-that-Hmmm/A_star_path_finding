@@ -1,6 +1,5 @@
- function OPEN = A_star_search(map, MAX_X, MAX_Y) % Return path
+ function path = A_star_search(map, MAX_X, MAX_Y,greedy_h,greedy_g) % Return path
 
-%%
     %This part is about map/obstacle/and other settings
     %pre-process the grid map, add offset
     size_map = size(map,1);
@@ -84,12 +83,10 @@
     CLOSED(CLOSED_COUNT,2)=yNode;
     NoPath=1;
     i_min = 1;  % initialise the minumum value of the row number
-    new_nodes = []; % this array will be used for expanding the node for   
-                    % searching. 
+    obs_nodes = CLOSED; % this array containing the obstacles
     gn = OPEN(OPEN_COUNT,7);
     loop_time = 0;
     
-%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % START ALGORITHM
 %   'xval' & 'yval' stores the coordinate of parent node
@@ -105,14 +102,14 @@
             break
         end
         
-        new_nodes = expand_array(node_x,node_y,gn,xTarget,yTarget,CLOSED,MAX_X,MAX_Y);
+        new_nodes = expand_array(node_x,node_y,gn,xTarget,yTarget,CLOSED,MAX_X,MAX_Y,greedy_h,greedy_g);
         %'new_nodes' FORMAT
+        %greedy_h for biasing on h(n), agent tend to go to target
+        %greedt_g for biasing on g(n), agent tend to explore
         %--------------------------------
         %|X val |Y val | h(n) |g(n)|f(n)|
         %--------------------------------
-        
 
-        
         size_new_nodes = size(new_nodes,1);
         
         % Checking repeated items
@@ -168,8 +165,33 @@
     
     % get the optimal path after searching
     path = [];
-    path(1,:) = [xTarget,yTarget];
-    path(2,:) = CLOSED(i_ref,:);
-    x_ref = CLOSED(i_ref,1);
-    y_ref = CLOSED(i_ref,2);
+    path(1,1)=xTarget;
+    path(1,2)=yTarget;   % path starts at the start
+    xNext = 0;
+    yNext = 0;
+    empty_node = 0;
+    
+    OPEN_length = size(OPEN,1);
+    for i3 = OPEN_length:-1:1   % finding the line index lead to target
+        if (OPEN(i3,2)==xTarget && OPEN(i3,3)==yTarget && NoPath == 1)
+            path(NoPath,:) = [xTarget, yTarget];
+            NoPath = NoPath + 1;
+            xNext = OPEN(i3,4);
+            yNext = OPEN(i3,5);
+        end
+        
+        if(OPEN(i3,2)==xNext && OPEN(i3,3)==yNext && NoPath ~= 1)
+            path(NoPath,:) = [xNext, yNext];
+            NoPath = NoPath + 1;
+            xNext = OPEN(i3, 4);
+            yNext = OPEN(i3, 5);
+        else
+            empty_node = empty_node + 1;
+        end
+    end  %  end of the for loop
+    
+%     path(1,:) = [xTarget,yTarget];  
+%     path(2,:) = CLOSED(i_ref,:);
+%     x_ref = CLOSED(i_ref,1);
+%     y_ref = CLOSED(i_ref,2);
 end

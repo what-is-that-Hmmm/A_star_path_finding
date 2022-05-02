@@ -1,10 +1,12 @@
-function exp_array=expand_array(node_x,node_y,gn,xTarget,yTarget,CLOSED,MAX_X,MAX_Y)
+function exp_array=expand_array(node_x,node_y,gn,xTarget,yTarget,...
+    CLOSED,MAX_X,MAX_Y,greedy_h,greedy_g)
     %Function to return an expanded array
     %This function takes a node and returns the expanded list
     %of successors,with the calculated fn values.
     %The criteria being none of the successors are on the CLOSED list.
     %
-    %Copyright 2009-2010 The MathWorks, Inc.
+    %'greedy_h' for biasing on h(n), agent tend to go to target
+    %'greedt_g' for biasing on g(n), agent tend to explore
     
     %EXPANDED ARRAY FORMAT
     %--------------------------------
@@ -31,7 +33,7 @@ function exp_array=expand_array(node_x,node_y,gn,xTarget,yTarget,CLOSED,MAX_X,MA
                         exp_array(exp_count,2) = s_y;
                         exp_array(exp_count,3) = distance(xTarget,yTarget,s_x,s_y);%distance between node and goal,hn
                         exp_array(exp_count,4) = gn+usr_distance(node_x,node_y,s_x,s_y);%cost of travelling to node£¬gn
-                        exp_array(exp_count,5) = exp_array(exp_count,3)+exp_array(exp_count,4);%fn
+                        exp_array(exp_count,5) = greedy_h*exp_array(exp_count,3)+greedy_g*exp_array(exp_count,4);%fn
                         exp_count=exp_count+1;
                     end%Populate the exp_array list!!!
                 end% End of node within array bound

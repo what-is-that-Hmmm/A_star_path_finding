@@ -13,10 +13,15 @@ MAX_Y = 25;
 map = obstacle_map(xStart, yStart, xTarget, yTarget, MAX_X, MAX_Y);
 
 % Waypoint Generator Using the A* 
-path = A_star_search(map, MAX_X,MAX_Y);
+greedy_h = 0.6;
+greedy_g = 0.4;
+%'greedy_h' for biasing on h(n), agent tend to go to target
+%'greedt_g' for biasing on g(n), agent tend to explore
+path = A_star_search(map, MAX_X,MAX_Y,greedy_h,greedy_g);
 
 % visualize the 2D grid map
-% visualize_map(map, path, []);
+figure,
+visualize_map(map, path, []);
 
 % save map
 % save('Data/map.mat', 'map', 'MAX_X', 'MAX_Y');
