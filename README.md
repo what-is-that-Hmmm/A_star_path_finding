@@ -45,3 +45,7 @@ map = obstacle_map(xStart, yStart, xTarget, yTarget, MAX_X, MAX_Y);
 
 path = A_star_search(map, MAX_X,MAX_Y,greedy_h,greedy_g);
 
+
+
+Current issues: The solution is not optimal when biasing on exploration. 
+Possible solution: Improve the logic for OPEN list, make it arranged from high to low when expanding.
