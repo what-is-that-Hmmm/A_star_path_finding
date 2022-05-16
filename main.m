@@ -13,8 +13,8 @@ MAX_Y = 25;
 map = obstacle_map(xStart, yStart, xTarget, yTarget, MAX_X, MAX_Y);
 
 % Waypoint Generator Using the A* 
-greedy_h = 0.6;
-greedy_g = 0.4;
+greedy_h = 0.5;
+greedy_g = 0.5;
 %'greedy_h' for biasing on h(n), agent tend to go to target
 %'greedt_g' for biasing on g(n), agent tend to explore
 path = A_star_search(map, MAX_X,MAX_Y,greedy_h,greedy_g);

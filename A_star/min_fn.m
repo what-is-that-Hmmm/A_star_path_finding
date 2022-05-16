@@ -25,7 +25,7 @@ function i_min = min_fn(OPEN,OPEN_COUNT,xTarget,yTarget)
  %  Send the index of the smallest node
  end;
  
- if size(temp_array ~= 0)
+ if size(temp_array) ~= 0
   [min_fn,temp_min]=min(temp_array(:,8));%Index of the smallest node in temp array
   i_min=temp_array(temp_min,9); % Index of the smallest node in the OPEN array
  else

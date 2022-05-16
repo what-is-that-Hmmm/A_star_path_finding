@@ -165,33 +165,37 @@
     
     % get the optimal path after searching
     path = [];
-    path(1,1)=xTarget;
-    path(1,2)=yTarget;   % path starts at the start
+
     xNext = 0;
     yNext = 0;
     empty_node = 0;
     
     OPEN_length = size(OPEN,1);
-    for i3 = OPEN_length:-1:1   % finding the line index lead to target
-        if (OPEN(i3,2)==xTarget && OPEN(i3,3)==yTarget && NoPath == 1)
-            path(NoPath,:) = [xTarget, yTarget];
-            NoPath = NoPath + 1;
-            xNext = OPEN(i3,4);
-            yNext = OPEN(i3,5);
-        end
-        
-        if(OPEN(i3,2)==xNext && OPEN(i3,3)==yNext && NoPath ~= 1)
-            path(NoPath,:) = [xNext, yNext];
-            NoPath = NoPath + 1;
-            xNext = OPEN(i3, 4);
-            yNext = OPEN(i3, 5);
-        else
-            empty_node = empty_node + 1;
-        end
-    end  %  end of the for loop
+    searching_list = sortrows(OPEN,7,'descend');
+%     searching_list = OPEN;
+
+    while ((xNext~=xStart)||(yNext~=yStart))
+        for i3 = OPEN_length:-1:1   % finding the line index lead to target
+            if (searching_list(i3,2)==xTarget && searching_list(i3,3)==yTarget && NoPath == 1)
+                path(NoPath,:) = [xTarget, yTarget];
+                NoPath = NoPath + 1;
+                xNext = searching_list(i3,4);
+                yNext = searching_list(i3,5);
+            end    % end of the if 'first node'
+
+            if(searching_list(i3,2)==xNext && searching_list(i3,3)==yNext && NoPath ~= 1 && searching_list(i3,1)==0)
+                path(NoPath,:) = [xNext, yNext];
+                NoPath = NoPath + 1;
+                xNext = searching_list(i3, 4);
+                yNext = searching_list(i3, 5);
+            else
+                empty_node = empty_node + 1;
+            end % end of the if 'later path'
+        end  %  end of the for loop 'local OPEN searching'
+    end % end of the while loop for 'global OPEN searching'
     
-%     path(1,:) = [xTarget,yTarget];  
-%     path(2,:) = CLOSED(i_ref,:);
-%     x_ref = CLOSED(i_ref,1);
-%     y_ref = CLOSED(i_ref,2);
+    % Add the starting point to 'path'
+    path(NoPath,:) = [xStart, yStart];
+    
+    
 end
